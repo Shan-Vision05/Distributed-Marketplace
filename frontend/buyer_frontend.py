@@ -7,8 +7,8 @@ from contextlib import asynccontextmanager
 
 from zeep import Client as ZeepClient
 
-CUSTOMER_DB_ADDR = ("10.128.0.4", 7001)
-PRODUCT_DB_ADDR = ("10.128.0.5", 7002)
+CUSTOMER_DB_ADDR = ("127.0.0.1", 7001)
+PRODUCT_DB_ADDR = ("127.0.0.1", 7002)
 FINANCIAL_SVC_ADDR = ("127.0.0.1", 7005)
 
 
@@ -370,10 +370,10 @@ def get_seller_rating(session_id: str, seller_id: int):
 
 
 if __name__ == "__main__":
-    print("Buyer Frontend running on http://0.0.0.0:7003")
+    print("Buyer Frontend running on http://127.0.0.1:7003")
     uvicorn.run(
         app,
-        host="0.0.0.0",
+        host="127.0.0.1",
         port=7003,
         timeout_keep_alive=120,
         limit_concurrency=300,

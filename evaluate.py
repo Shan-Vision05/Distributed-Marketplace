@@ -6,9 +6,9 @@ from common.rest_client import RESTClient
 
 CALLS_PER_CLIENT = 1000
 NUM_RUNS = 3
-BUYER_HOST = '34.71.160.216'
+BUYER_HOST = '127.0.0.1'
 BUYER_PORT = 7003
-SELLER_HOST = '136.115.93.27'
+SELLER_HOST = '127.0.0.1'
 SELLER_PORT = 7004
 
 
@@ -156,8 +156,8 @@ def run_scenario(num_buyers, num_sellers):
 def main():
     scenarios = [
         (1, 1),
-        (10, 10),
-        (100, 100),
+        # (10, 10),
+        # (100, 100),
     ]
 
     results = []

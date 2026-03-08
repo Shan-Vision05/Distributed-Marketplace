@@ -1,0 +1,6 @@
+nohup: ignoring input
+Starting Marketplace Web UI on port 7010...
+INFO:     Started server process [207498]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:7010 (Press CTRL+C to quit)

@@ -6,8 +6,8 @@ import anyio
 from contextlib import asynccontextmanager
 
 
-CUSTOMER_DB_ADDR = ("10.128.0.4", 7001)
-PRODUCT_DB_ADDR = ("10.128.0.5", 7002)
+CUSTOMER_DB_ADDR = ("127.0.0.1", 7001)
+PRODUCT_DB_ADDR = ("127.0.0.1", 7002)
 
 
 @asynccontextmanager
@@ -216,10 +216,10 @@ def get_seller_rating(session_id: str):
 
 
 if __name__ == "__main__":
-    print("Seller Frontend running on http://0.0.0.0:7004")
+    print("Seller Frontend running on http://127.0.0.1:7004")
     uvicorn.run(
         app,
-        host="0.0.0.0",
+        host="127.0.0.1",
         port=7004,
         timeout_keep_alive=120,
         limit_concurrency=300,

@@ -84,6 +84,7 @@ The buyer frontend then calls the SOAP financial service. When approved, the sys
 ├── deploy/             # Startup scripts for distributed deployment
 ├── frontend/           # Buyer and seller frontend REST services
 ├── services/           # Supporting services such as financial transactions
+├── webui/              # Minimal browser-based UI for buyers and sellers
 ├── evaluate.py         # Performance evaluation runner
 ├── PerformanceReport.md
 ├── README.md
@@ -98,6 +99,7 @@ The buyer frontend then calls the SOAP financial service. When approved, the sys
 - SQLite
 - SOAP/WSDL via `spyne` and `zeep`
 - `requests`
+- Vanilla HTML, CSS, and JavaScript for the browser UI
 
 ## Setup
 
@@ -117,6 +119,7 @@ Automated startup scripts are available in the `deploy/` directory:
 ./deploy/start_financial_service.sh
 ./deploy/start_seller_frontend.sh
 ./deploy/start_buyer_frontend.sh
+./deploy/start_web_ui.sh
 ```
 
 For the intended deployment model, run services on separate VMs in roughly this order:
@@ -129,18 +132,79 @@ For the intended deployment model, run services on separate VMs in roughly this 
    - `Seller Frontend` on port `7004`
 3. Start the financial service
    - `Financial Transaction Service` on port `7005`
-4. Start the clients
+4. Start the web UI
+   - `Marketplace Web UI` on port `7010`
+5. Start the clients
 
 ```bash
+python -m webui.app
 python -m client.seller_cli
 python -m client.buyer_cli
 ```
 
 See `deploy/README.md` for deployment script details.
 
+## Web UI
+
+The project now includes a minimal browser-based interface for the main marketplace flows.
+
+### Supported UI flows
+
+- Buyer login and account creation
+- Seller login and account creation
+- Product search and browsing
+- Add to cart and remove from cart
+- Save cart and clear cart
+- Checkout with payment details
+- Purchase history and feedback submission
+- Seller inventory view
+- Seller product creation
+- Seller price and quantity updates
+- Seller rating view
+
+### Start the UI
+
+```bash
+python -m webui.app
+```
+
+Then open:
+
+```text
+http://127.0.0.1:7010
+```
+
+### UI configuration
+
+The UI proxies requests to the existing buyer and seller frontend services. You can override the default service URLs with environment variables:
+
+```bash
+export BUYER_FRONTEND_URL=http://127.0.0.1:7003
+export SELLER_FRONTEND_URL=http://127.0.0.1:7004
+export WEBUI_PORT=7010
+python -m webui.app
+```
+
 ## Local Notes
 
-This project was designed for multi-VM deployment. If you want to run everything locally, update configured IP addresses to localhost or the appropriate local network addresses.
+This project is now configured to run locally on `127.0.0.1` by default.
+
+To start the full stack in one command, using a separate process for each service:
+
+```bash
+./deploy/start_local_stack.sh
+```
+
+This starts:
+
+- Customer DB
+- Product DB
+- Financial Transaction Service
+- Seller Frontend
+- Buyer Frontend
+- Web UI
+
+Logs are written to `deploy/logs/`.
 
 ## Search Behavior
 

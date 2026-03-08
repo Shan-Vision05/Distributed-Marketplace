@@ -144,7 +144,7 @@ def main(host='127.0.0.1', port=7004):
 
 
 if __name__ == '__main__':
-    host = '136.115.93.27'
+    host = '127.0.0.1'
     port = 7004
     if len(sys.argv) >= 2:
         host = sys.argv[1]

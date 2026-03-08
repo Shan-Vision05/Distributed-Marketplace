@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Distributed Marketplace</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Distributed Marketplace</p>
+        <h1>Minimal web console</h1>
+        <p class="subtle">A clean buyer and seller interface for browsing products, managing inventory, and completing purchases.</p>
+      </div>
+      <div class="topbar-actions">
+        <div class="status-block">
+          <span class="status-label">Session</span>
+          <strong id="sessionStatus">Signed out</strong>
+        </div>
+        <button id="logoutButton" class="button secondary" hidden>Logout</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="panel sidebar">
+        <div class="panel-header">
+          <h2>Access</h2>
+          <p>Login or create an account as a buyer or seller.</p>
+        </div>
+
+        <div class="segmented" id="roleSelector">
+          <button class="active" data-role="buyer">Buyer</button>
+          <button data-role="seller">Seller</button>
+        </div>
+
+        <div class="segmented subtle-segment" id="authModeSelector">
+          <button class="active" data-mode="login">Login</button>
+          <button data-mode="register">Create account</button>
+        </div>
+
+        <form id="authForm" class="stacked-form">
+          <label>
+            <span>Username</span>
+            <input id="authUsername" name="username" type="text" autocomplete="username" required>
+          </label>
+          <label>
+            <span>Password</span>
+            <input id="authPassword" name="password" type="password" autocomplete="current-password" required>
+          </label>
+          <button id="authSubmit" class="button primary" type="submit">Login</button>
+        </form>
+
+        <div class="helper-card">
+          <h3>What this UI covers</h3>
+          <ul>
+            <li>Buyer and seller authentication</li>
+            <li>Product search and inventory browsing</li>
+            <li>Cart management and checkout</li>
+            <li>Seller inventory updates and pricing</li>
+            <li>Order history and seller feedback</li>
+          </ul>
+        </div>
+
+        <div class="helper-card muted">
+          <h3>Project-aware defaults</h3>
+          <p>Buyer browsing uses the existing buyer frontend, seller tools use the seller frontend, and all UI requests are proxied by this web app.</p>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <div id="messageBanner" class="banner" hidden></div>
+
+        <section id="welcomePanel" class="panel hero-panel">
+          <div>
+            <p class="eyebrow">Start here</p>
+            <h2>Use the marketplace through a browser</h2>
+            <p class="subtle">Choose a role, sign in, then switch between buyer tools or seller tools. The UI is intentionally minimal but covers the main end-to-end flows.</p>
+          </div>
+          <div class="hero-grid">
+            <div class="metric-card">
+              <span>Buyer flow</span>
+              <strong>Search → Cart → Checkout</strong>
+            </div>
+            <div class="metric-card">
+              <span>Seller flow</span>
+              <strong>Inventory → Price → Stock</strong>
+            </div>
+            <div class="metric-card">
+              <span>Session model</span>
+              <strong>Role-based login</strong>
+            </div>
+          </div>
+        </section>
+
+        <section id="buyerDashboard" class="dashboard" hidden>
+          <div class="panel-header dashboard-header">
+            <div>
+              <p class="eyebrow">Buyer workspace</p>
+              <h2 id="buyerTitle">Welcome buyer</h2>
+            </div>
+            <button id="buyerRefresh" class="button ghost">Refresh data</button>
+          </div>
+
+          <div class="tab-row" id="buyerTabRow">
+            <button class="active" data-target="buyerCatalogPanel">Browse products</button>
+            <button data-target="buyerCartPanel">Cart</button>
+            <button data-target="buyerOrdersPanel">Orders</button>
+          </div>
+
+          <section id="buyerCatalogPanel" class="panel tab-panel active">
+            <div class="panel-header split-header">
+              <div>
+                <h3>Product catalog</h3>
+                <p>Search across categories or browse everything with category <strong>0</strong>.</p>
+              </div>
+              <span id="catalogCount" class="pill">0 results</span>
+            </div>
+
+            <form id="searchForm" class="inline-form two-columns">
+              <label>
+                <span>Category</span>
+                <input id="searchCategory" type="number" min="0" value="0">
+              </label>
+              <label>
+                <span>Keywords</span>
+                <input id="searchKeywords" type="text" placeholder="laptop, apple, keyboard">
+              </label>
+              <button class="button primary" type="submit">Search</button>
+            </form>
+
+            <div id="productGrid" class="card-grid empty-state-host"></div>
+          </section>
+
+          <section id="buyerCartPanel" class="panel tab-panel" hidden>
+            <div class="panel-header split-header">
+              <div>
+                <h3>Your cart</h3>
+                <p>Review quantities, save the cart, or complete checkout.</p>
+              </div>
+              <div class="toolbar-row">
+                <button id="saveCartButton" class="button secondary">Save cart</button>
+                <button id="clearCartButton" class="button ghost">Clear cart</button>
+              </div>
+            </div>
+
+            <div id="cartSummary" class="summary-bar"></div>
+            <div id="cartItems" class="list-stack empty-state-host"></div>
+
+            <div class="checkout-block">
+              <div class="panel-header compact">
+                <div>
+                  <h3>Checkout</h3>
+                  <p>Complete a purchase using the existing financial service flow.</p>
+                </div>
+              </div>
+              <form id="checkoutForm" class="inline-form two-columns">
+                <label>
+                  <span>Cardholder name</span>
+                  <input id="checkoutName" type="text" required>
+                </label>
+                <label>
+                  <span>Card number</span>
+                  <input id="checkoutCardNumber" type="text" inputmode="numeric" placeholder="16 digits" required>
+                </label>
+                <label>
+                  <span>Exp month</span>
+                  <input id="checkoutMonth" type="text" inputmode="numeric" placeholder="MM" required>
+                </label>
+                <label>
+                  <span>Exp year</span>
+                  <input id="checkoutYear" type="text" inputmode="numeric" placeholder="YYYY" required>
+                </label>
+                <label>
+                  <span>CVV</span>
+                  <input id="checkoutCvv" type="password" inputmode="numeric" placeholder="3 digits" required>
+                </label>
+                <button class="button primary" type="submit">Buy now</button>
+              </form>
+            </div>
+          </section>
+
+          <section id="buyerOrdersPanel" class="panel tab-panel" hidden>
+            <div class="panel-header split-header">
+              <div>
+                <h3>Purchase history</h3>
+                <p>Review completed purchases and leave seller feedback.</p>
+              </div>
+              <span id="ordersCount" class="pill">0 orders</span>
+            </div>
+            <div id="ordersList" class="list-stack empty-state-host"></div>
+          </section>
+        </section>
+
+        <section id="sellerDashboard" class="dashboard" hidden>
+          <div class="panel-header dashboard-header">
+            <div>
+              <p class="eyebrow">Seller workspace</p>
+              <h2 id="sellerTitle">Welcome seller</h2>
+            </div>
+            <button id="sellerRefresh" class="button ghost">Refresh data</button>
+          </div>
+
+          <div class="tab-row" id="sellerTabRow">
+            <button class="active" data-target="sellerInventoryPanel">Inventory</button>
+            <button data-target="sellerCreatePanel">Add product</button>
+            <button data-target="sellerRatingPanel">Rating</button>
+          </div>
+
+          <section id="sellerInventoryPanel" class="panel tab-panel active">
+            <div class="panel-header split-header">
+              <div>
+                <h3>Inventory</h3>
+                <p>See products for sale and quickly adjust prices or stock.</p>
+              </div>
+              <span id="inventoryCount" class="pill">0 items</span>
+            </div>
+            <div id="inventoryGrid" class="card-grid empty-state-host"></div>
+          </section>
+
+          <section id="sellerCreatePanel" class="panel tab-panel" hidden>
+            <div class="panel-header compact">
+              <div>
+                <h3>Add a new product</h3>
+                <p>Create inventory entries using the seller frontend.</p>
+              </div>
+            </div>
+            <form id="createProductForm" class="inline-form two-columns">
+              <label>
+                <span>Name</span>
+                <input id="createName" type="text" required>
+              </label>
+              <label>
+                <span>Category</span>
+                <input id="createCategory" type="number" min="1" required>
+              </label>
+              <label>
+                <span>Keywords</span>
+                <input id="createKeywords" type="text" placeholder="comma or space separated">
+              </label>
+              <label>
+                <span>Condition</span>
+                <select id="createCondition">
+                  <option value="new">new</option>
+                  <option value="used">used</option>
+                </select>
+              </label>
+              <label>
+                <span>Price</span>
+                <input id="createPrice" type="number" min="0.01" step="0.01" required>
+              </label>
+              <label>
+                <span>Quantity</span>
+                <input id="createQuantity" type="number" min="1" required>
+              </label>
+              <button class="button primary" type="submit">Create product</button>
+            </form>
+          </section>
+
+          <section id="sellerRatingPanel" class="panel tab-panel" hidden>
+            <div class="panel-header split-header">
+              <div>
+                <h3>Seller rating</h3>
+                <p>Feedback totals linked to your seller account.</p>
+              </div>
+            </div>
+            <div id="sellerRatingCard" class="hero-grid single"></div>
+          </section>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script src="/assets/app.js" defer></script>
+</body>
+</html>

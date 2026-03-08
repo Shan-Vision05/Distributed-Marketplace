@@ -1,0 +1,545 @@
+:root {
+  color-scheme: light;
+  --bg: #f5f7fb;
+  --panel: #ffffff;
+  --panel-muted: #f8fafc;
+  --border: #dde4ee;
+  --text: #122033;
+  --muted: #5a677a;
+  --primary: #2563eb;
+  --primary-soft: #dbeafe;
+  --success: #0f766e;
+  --danger: #b42318;
+  --warning: #b54708;
+  --shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  --radius: 18px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+  color: var(--text);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app-shell {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+.topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.topbar h1,
+.panel-header h2,
+.panel-header h3,
+.hero-panel h2 {
+  margin: 0;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.subtle {
+  margin: 8px 0 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status-block {
+  min-width: 180px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(221, 228, 238, 0.8);
+  backdrop-filter: blur(8px);
+}
+
+.status-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr);
+  gap: 24px;
+}
+
+.panel,
+.dashboard {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(221, 228, 238, 0.9);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.sidebar {
+  padding: 24px;
+  position: sticky;
+  top: 24px;
+  align-self: start;
+}
+
+.workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.panel-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
+.dashboard-header,
+.split-header,
+.compact {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.compact {
+  margin-bottom: 14px;
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 6px;
+  background: var(--panel-muted);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+}
+
+.segmented button,
+.tab-row button {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  padding: 12px 14px;
+  border-radius: 10px;
+  transition: 0.2s ease;
+}
+
+.segmented button.active,
+.tab-row button.active {
+  background: var(--panel);
+  color: var(--text);
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
+}
+
+.subtle-segment {
+  margin-bottom: 18px;
+}
+
+.stacked-form,
+.inline-form {
+  display: grid;
+  gap: 14px;
+}
+
+.two-columns {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.stacked-form label,
+.inline-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+label span {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+}
+
+input:focus,
+select:focus {
+  outline: 2px solid rgba(37, 99, 235, 0.15);
+  border-color: var(--primary);
+}
+
+.button {
+  border: 0;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-weight: 600;
+}
+
+.button.primary {
+  background: var(--primary);
+  color: white;
+}
+
+.button.secondary {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.button.ghost {
+  background: #eef2ff;
+  color: #3730a3;
+}
+
+.button.danger {
+  background: #fee4e2;
+  color: var(--danger);
+}
+
+.button.small {
+  padding: 10px 12px;
+  font-size: 14px;
+}
+
+.helper-card,
+.metric-card,
+.empty-state,
+.summary-bar,
+.list-item,
+.checkout-block,
+.inventory-controls,
+.rating-card {
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--panel-muted);
+}
+
+.helper-card {
+  padding: 16px;
+  margin-top: 18px;
+}
+
+.helper-card h3,
+.metric-card strong,
+.empty-state h3 {
+  margin-top: 0;
+}
+
+.helper-card ul {
+  padding-left: 18px;
+  margin-bottom: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.helper-card.muted {
+  background: #f8fafc;
+}
+
+.hero-panel {
+  padding: 28px;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.hero-grid.single {
+  grid-template-columns: 1fr;
+  margin-top: 0;
+}
+
+.metric-card,
+.rating-card {
+  padding: 18px;
+}
+
+.metric-card span,
+.meta-row span,
+.item-meta span,
+.rating-card span {
+  display: block;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.metric-card strong,
+.rating-card strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 20px;
+}
+
+.banner {
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  background: #ecfdf3;
+  color: #027a48;
+}
+
+.banner.error {
+  background: #fef3f2;
+  color: var(--danger);
+  border-color: #fecdca;
+}
+
+.dashboard {
+  padding: 22px;
+}
+
+.tab-row {
+  display: flex;
+  gap: 10px;
+  padding: 6px;
+  border-radius: 14px;
+  background: var(--panel-muted);
+  border: 1px solid var(--border);
+  margin-bottom: 18px;
+  overflow-x: auto;
+}
+
+.tab-panel {
+  padding: 22px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.product-card,
+.inventory-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: white;
+}
+
+.product-title-row,
+.inventory-title-row,
+.list-head,
+.toolbar-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.product-card h4,
+.inventory-card h4,
+.list-head h4 {
+  margin: 0;
+}
+
+.pill,
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pill {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.badge.success {
+  background: #ecfdf3;
+  color: #027a48;
+}
+
+.badge.warning {
+  background: #fff6ed;
+  color: var(--warning);
+}
+
+.badge.muted {
+  background: #f2f4f7;
+  color: #475467;
+}
+
+.item-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.item-meta strong,
+.meta-row strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 15px;
+}
+
+.keyword-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.keyword-chip {
+  background: #eef2ff;
+  color: #3730a3;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.inline-action {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.inline-action input {
+  max-width: 110px;
+}
+
+.list-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.list-item {
+  padding: 18px;
+}
+
+.summary-bar,
+.checkout-block {
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.meta-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.order-actions,
+.inventory-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.inventory-controls {
+  padding: 14px;
+}
+
+.empty-state {
+  padding: 28px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.empty-state p {
+  margin-bottom: 0;
+}
+
+@media (max-width: 1100px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+  }
+
+  .hero-grid,
+  .two-columns,
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    padding: 18px;
+  }
+
+  .topbar,
+  .dashboard-header,
+  .split-header,
+  .compact,
+  .product-title-row,
+  .inventory-title-row,
+  .list-head,
+  .toolbar-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .topbar-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .tab-panel,
+  .dashboard,
+  .sidebar,
+  .hero-panel {
+    padding: 18px;
+  }
+}

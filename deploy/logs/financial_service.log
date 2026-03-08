@@ -1,0 +1,3 @@
+Starting Financial Service on port 7005...
+127.0.0.1 - - [07/Mar/2026 21:51:39] "GET /?wsdl HTTP/1.1" 200 3078
+127.0.0.1 - - [07/Mar/2026 21:51:40] "POST / HTTP/1.1" 200 337

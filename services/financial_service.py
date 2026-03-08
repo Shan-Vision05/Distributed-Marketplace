@@ -81,6 +81,6 @@ wsgi_app = WsgiApplication(app)
 
 
 if __name__ == "__main__":
-    server = make_server("0.0.0.0", 7005, wsgi_app)
-    print("Financial service running on port 7005")
+    server = make_server("127.0.0.1", 7005, wsgi_app)
+    print("Financial service running on http://127.0.0.1:7005")
     server.serve_forever()

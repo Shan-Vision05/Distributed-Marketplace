@@ -11,7 +11,7 @@ from common import marketplace_pb2, marketplace_pb2_grpc
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "customer.db")
 
-product_channel = grpc.insecure_channel("10.128.0.5:7002")
+product_channel = grpc.insecure_channel("127.0.0.1:7002")
 product_stub = marketplace_pb2_grpc.ProductServiceStub(product_channel)
 
 
@@ -502,7 +502,7 @@ if __name__ == "__main__":
     marketplace_pb2_grpc.add_CustomerServiceServicer_to_server(
         CustomerServiceServicer(), server
     )
-    server.add_insecure_port("0.0.0.0:7001")
+    server.add_insecure_port("127.0.0.1:7001")
     server.start()
-    print("Customer DB gRPC Server on port 7001")
+    print("Customer DB gRPC Server on http://127.0.0.1:7001")
     server.wait_for_termination()
