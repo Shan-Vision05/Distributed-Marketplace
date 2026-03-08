@@ -1,0 +1,194 @@
+syntax = "proto3";
+
+package marketplace;
+
+
+message ItemId {
+  int32 category = 1;
+  int32 num = 2;
+}
+
+message Feedback {
+  int32 up = 1;
+  int32 down = 2;
+}
+
+message Item {
+  ItemId item_id = 1;
+  string name = 2;
+  int32 category = 3;
+  repeated string keywords = 4;
+  string condition = 5;
+  double price = 6;
+  int32 quantity = 7;
+  int32 seller_id = 8;
+  Feedback feedback = 9;
+}
+
+
+message CreateAccountRequest {
+  string role = 1;
+  string username = 2;
+  string password = 3;
+}
+
+message CreateAccountResponse {
+  int32 user_id = 1;
+}
+
+message LoginRequest {
+  string role = 1;
+  string username = 2;
+  string password = 3;
+}
+
+message LoginResponse {
+  string session_id = 1;
+}
+
+message SessionRequest {
+  string session_id = 1;
+}
+
+message ValidateSessionResponse {
+  string role = 1;
+  int32 user_id = 2;
+  string username = 3;
+}
+
+message LogoutResponse {}
+
+message CartItemRequest {
+  string session_id = 1;
+  ItemId item_id = 2;
+  int32 quantity = 3;
+}
+
+message CartModifyResponse {}
+
+message CartEntry {
+  ItemId item_id = 1;
+  int32 quantity = 2;
+}
+
+message GetCartResponse {
+  repeated CartEntry items = 1;
+}
+
+message UpdateSellerFeedbackRequest {
+  int32 seller_id = 1;
+  string feedback_type = 2;
+}
+
+message UpdateSellerFeedbackResponse {}
+
+message PurchaseRecord {
+  ItemId item_id = 1;
+  string item_name = 2;
+  int32 quantity = 3;
+  double price = 4;
+  string purchased_at = 5;
+}
+
+message GetBuyerPurchasesResponse {
+  repeated PurchaseRecord purchases = 1;
+}
+
+message GetSellerRatingRequest {
+  string session_id = 1;
+  int32 seller_id = 2;
+}
+
+message GetSellerRatingResponse {
+  Feedback feedback = 1;
+}
+
+message MakePurchaseResponse {
+  string message = 1;
+}
+
+
+message RegisterItemRequest {
+  int32 seller_id = 1;
+  string name = 2;
+  int32 category = 3;
+  repeated string keywords = 4;
+  string condition = 5;
+  double price = 6;
+  int32 quantity = 7;
+}
+
+message RegisterItemResponse {
+  ItemId item_id = 1;
+}
+
+message ChangePriceRequest {
+  ItemId item_id = 1;
+  double price = 2;
+}
+
+message ChangePriceResponse {}
+
+message UpdateUnitsRequest {
+  ItemId item_id = 1;
+  int32 quantity = 2;
+}
+
+message UpdateUnitsResponse {}
+
+message SellerItemsRequest {
+  int32 seller_id = 1;
+}
+
+message ItemListResponse {
+  repeated Item items = 1;
+}
+
+message GetItemRequest {
+  ItemId item_id = 1;
+}
+
+message GetItemResponse {
+  Item item = 1;
+}
+
+message ProvideFeedbackRequest {
+  ItemId item_id = 1;
+  string feedback_type = 2;
+}
+
+message ProvideFeedbackResponse {
+  string seller_update_status = 1;
+}
+
+message SearchItemsRequest {
+  int32 category = 1;
+  repeated string keywords = 2;
+}
+
+
+service CustomerService {
+  rpc CreateAccount (CreateAccountRequest) returns (CreateAccountResponse);
+  rpc Login (LoginRequest) returns (LoginResponse);
+  rpc ValidateSession (SessionRequest) returns (ValidateSessionResponse);
+  rpc Logout (SessionRequest) returns (LogoutResponse);
+  rpc AddItemToCart (CartItemRequest) returns (CartModifyResponse);
+  rpc RemoveFromCart (CartItemRequest) returns (CartModifyResponse);
+  rpc ClearCart (SessionRequest) returns (CartModifyResponse);
+  rpc SaveCart (SessionRequest) returns (CartModifyResponse);
+  rpc UpdateSellerFeedback (UpdateSellerFeedbackRequest) returns (UpdateSellerFeedbackResponse);
+  rpc GetCart (SessionRequest) returns (GetCartResponse);
+  rpc GetBuyerPurchases (SessionRequest) returns (GetBuyerPurchasesResponse);
+  rpc GetSellerRating (GetSellerRatingRequest) returns (GetSellerRatingResponse);
+  rpc MakePurchase (SessionRequest) returns (MakePurchaseResponse);
+}
+
+service ProductService {
+  rpc RegisterItemForSale (RegisterItemRequest) returns (RegisterItemResponse);
+  rpc ChangeItemPrice (ChangePriceRequest) returns (ChangePriceResponse);
+  rpc UpdateUnitsForSale (UpdateUnitsRequest) returns (UpdateUnitsResponse);
+  rpc DisplayItemsForSale (SellerItemsRequest) returns (ItemListResponse);
+  rpc GetItem (GetItemRequest) returns (GetItemResponse);
+  rpc ProvideFeedback (ProvideFeedbackRequest) returns (ProvideFeedbackResponse);
+  rpc SearchItemsForSale (SearchItemsRequest) returns (ItemListResponse);
+}
