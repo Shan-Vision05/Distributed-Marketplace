@@ -1,110 +1,273 @@
-# Programming Assignment 2
+# Distributed Marketplace
 
-## System Design
+A distributed online marketplace built as a multi-service system with separate buyer and seller clients, stateless frontend services, backend database services, and a financial transaction service.
 
-This is an online marketplace system with seven components: Buyer CLI, Seller CLI, Buyer Frontend Server, Seller Frontend Server, Customer DB, Product DB, and Financial Transaction Service. Each component runs independently as a separate process on different VMs in the cloud(except Financial Transaction, which runs on buyer VM). The system uses anarchitecture with RESTful HTTP for client-frontend communication (using FastAPI and `requests`), gRPC for frontend-backend database communication (using Protocol Buffers defined in `marketplace.proto`), and SOAP/WSDL for financial service integration (using `spyne` server and `zeep` client). 
+This repository packages the project as a proper GitHub-ready codebase with architecture, deployment, usage, and performance documentation in one place.
 
-Frontend servers are stateless all persistent state is stored in backend SQLite databases with WAL mode for concurrent access. Sessions are validated on every request via gRPC calls to the Customer DB. The Financial Transaction Service does payment processing with 90% approval and 10% decline rate for valid requests.
+## Overview
 
-## Assumptions and Limitations
+The system is composed of seven major components:
 
-- Financial Transaction Service uses a simple SOAP prototype that randomly approves 90% and declines 10% of valid payment requests
-- Sessions expire after 5 minutes of inactivity
-- Keywords are normalized to lowercase, truncated to 8 characters, and limited to 5 per item
-- The system is designed for separate VM deployment and cannot run a single machine without changing the IP addresses to local host
-- Financial Service runs on the same VM as Buyer Frontend (allowed sa per requirements)
-- Database files are recreated on each service restart for fresh testing
+- Buyer CLI
+- Seller CLI
+- Buyer Frontend Server
+- Seller Frontend Server
+- Customer DB service
+- Product DB service
+- Financial Transaction Service
 
-## Current State
+The design follows a distributed architecture where services run as independent processes, typically across separate VMs. The main communication paths are:
 
-**What Works:**
-- All RESTful APIs for buyers and sellers (create account, login, logout, item management, cart operations, search, purchase, feedback)
-- Complete MakePurchase implementation with credit card validation and SOAP-based financial service integration
-- gRPC communication between all frontend and backend servers
-- Stateless frontend design with session management via backend
-- Concurrent request handling with proper connection pooling and thread management
-- Search functionality with keyword matching and ranking
-- Performance evaluation across three scenarios (1+1, 10+10, 100+100 concurrent clients)
+- **Client ↔ Frontend:** REST over HTTP using FastAPI and `requests`
+- **Frontend ↔ Backend databases:** gRPC using Protocol Buffers
+- **Frontend ↔ Financial service:** SOAP/WSDL using `spyne` and `zeep`
+- **Persistence layer:** SQLite with WAL mode for concurrent access
 
-**Limitations:**
-- System saturates at ~200 concurrent clients (Scenario 3) with significant latency increase
+Frontend services are stateless. Persistent marketplace data is stored in backend databases, and user session validation is handled through backend calls on each request.
 
+## Architecture Highlights
 
-## Deployment
+- Stateless buyer and seller frontend services
+- Separate customer and product database services
+- Persistent storage with SQLite WAL mode
+- SOAP-based payment service integration for checkout
+- REST APIs for client-facing interactions
+- gRPC contracts for internal service communication
+- Concurrent request handling for multi-client workloads
 
-Automated deployment scripts are provided in the `deploy/` folder. These scripts automatically navigate to the project root and can be run from any directory:
+## Features
 
-```bash
-./deploy/start_customer_db.sh       # Starts Customer DB (port 7001) - removes old DB first
-./deploy/start_product_db.sh        # Starts Product DB (port 7002) - removes old DB first
-./deploy/start_financial_service.sh # Starts Financial Service (port 7005)
-./deploy/start_seller_frontend.sh   # Starts Seller Frontend (port 7004)
-./deploy/start_buyer_frontend.sh    # Starts Buyer Frontend (port 7003)
+### Seller Features
+
+- Create account
+- Login / logout
+- Register an item for sale
+- Change item price
+- Update available inventory
+- Display items for sale
+- Get seller rating
+
+### Buyer Features
+
+- Create account
+- Login / logout
+- Search items
+- Get item details
+- Add item to cart
+- Remove item from cart
+- Get cart
+- Clear cart
+- Save cart
+- Make purchase
+- Get buyer purchase history
+- Provide feedback
+- Get seller rating
+
+### Purchase Flow
+
+`MakePurchase` validates credit card information, including:
+
+- 16-digit card number
+- 3-digit CVV
+- Valid expiration date
+- Cardholder name
+
+The buyer frontend then calls the SOAP financial service. When approved, the system deducts inventory, stores purchase history, and clears the cart.
+
+## Repository Structure
+
+```text
+.
+├── backend/            # Database-backed service implementations
+├── client/             # Buyer and seller CLI clients
+├── common/             # Shared protocol, gRPC, REST, and TCP utilities
+├── deploy/             # Startup scripts for distributed deployment
+├── frontend/           # Buyer and seller frontend REST services
+├── services/           # Supporting services such as financial transactions
+├── evaluate.py         # Performance evaluation runner
+├── PerformanceReport.md
+├── README.md
+└── requirements.txt
 ```
 
-See `deploy/README.md` for detailed deployment instructions.
+## Tech Stack
 
-## Installation
+- Python
+- FastAPI
+- gRPC / Protocol Buffers
+- SQLite
+- SOAP/WSDL via `spyne` and `zeep`
+- `requests`
 
-Install dependencies:
+## Setup
+
+### Install dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
-## Running the System
+## Deployment
 
-Note: you will have to update the IP addresses if you are running on your own VMs.
+Automated startup scripts are available in the `deploy/` directory:
 
-### Using Deployment Scripts
+```bash
+./deploy/start_customer_db.sh
+./deploy/start_product_db.sh
+./deploy/start_financial_service.sh
+./deploy/start_seller_frontend.sh
+./deploy/start_buyer_frontend.sh
+```
 
-Run each script in a separate VM in this order:
+For the intended deployment model, run services on separate VMs in roughly this order:
 
-1. Start backend databases:
-   ```bash
-   ./deploy/start_customer_db.sh
-   ./deploy/start_product_db.sh
-   ```
+1. Start backend services
+   - `Customer DB` on port `7001`
+   - `Product DB` on port `7002`
+2. Start frontend services
+   - `Buyer Frontend` on port `7003`
+   - `Seller Frontend` on port `7004`
+3. Start the financial service
+   - `Financial Transaction Service` on port `7005`
+4. Start the clients
 
-2. Start frontend services:
-   ```bash
-   ./deploy/start_seller_frontend.sh
-   ./deploy/start_buyer_frontend.sh
-   ./deploy/start_financial_service.sh  # on buyer frontend VM
-   ```
+```bash
+python -m client.seller_cli
+python -m client.buyer_cli
+```
 
-3. Run clients:
-   ```bash
-   python -m client.seller_cli
-   python -m client.buyer_cli
-   ```
+See `deploy/README.md` for deployment script details.
 
-## Performance Evaluation
+## Local Notes
 
-Run the evaluation script to measure system performance:
+This project was designed for multi-VM deployment. If you want to run everything locally, update configured IP addresses to localhost or the appropriate local network addresses.
+
+## Search Behavior
+
+Item search filters by category and keyword matches. Results are ranked by:
+
+1. Number of matching keywords
+2. Feedback score (upvotes minus downvotes)
+3. Lower price
+
+Keyword handling rules:
+
+- Normalized to lowercase
+- Truncated to 8 characters
+- Limited to 5 keywords per item
+
+## Assumptions and Limitations
+
+- The financial transaction service is a prototype and randomly approves about 90% of valid payment requests
+- Sessions expire after 5 minutes of inactivity
+- The system is optimized for distributed deployment rather than single-machine execution
+- The financial service is expected to run on the buyer-side VM in the provided deployment model
+- Database files are recreated on service restart for fresh testing
+- The system begins to saturate at high concurrency levels, especially around the 100 buyer + 100 seller scenario
+
+## Running the Evaluation
+
+Use the benchmark script to run the performance scenarios:
 
 ```bash
 python -m evaluate
 ```
 
-This runs three scenarios (1+1, 10+10, 100+100 concurrent clients) with 1000 operations per client across 3 runs. Results are documented in `PerformanceReport.md`.
+The evaluation uses:
 
-## API Overview
+- 3 runs per scenario
+- 1000 API calls per client per run
+- Buyer workload: `GetCart`
+- Seller workload: `DisplayItemsForSale`
 
-**Seller APIs**: CreateAccount, Login, Logout, RegisterItemForSale, ChangeItemPrice, UpdateUnitsForSale, DisplayItemsForSale, GetSellerRating
+## Performance Summary
 
-**Buyer APIs**: CreateAccount, Login, Logout, SearchItems, GetItem, AddItemToCart, RemoveFromCart, GetCart, ClearCart, SaveCart, MakePurchase, GetBuyerPurchases, ProvideFeedback, GetSellerRating
+### Experimental Setup
 
-**MakePurchase** validates credit card information (16-digit card number, 3-digit CVV, valid expiration, cardholder name) via SOAP Financial Service, then processes the cart by deducting inventory, recording purchase history, and clearing the cart.
+All seven components were executed as independent processes. Customer DB, Product DB, Seller Frontend, and Buyer Frontend were deployed on separate VMs. The financial transaction service ran on the buyer-side VM, which was allowed by the project requirements.
 
-## Search Functionality
+### Metrics
 
-Item search filters by category and matches keywords. Results are ranked by:
-1. Number of matching keywords
-2. Item feedback score (upvotes minus downvotes)
-3. Lower price
+- **Average Response Time:** Time from sending a REST request to receiving the HTTP response
+- **Average Throughput:** Completed operations divided by execution time
+- **Wall Time:** Total time for the entire run
 
-## Documentation
+### Scenario Results
 
-- `PerformanceReport.md` - Complete performance analysis with metrics for all three scenarios and PA1 vs PA2 comparison
-- `deploy/README.md` - Deployment script documentation
-- `common/marketplace.proto` - gRPC service definitions
+#### Scenario 1: 1 Buyer + 1 Seller
+
+| Run | Response Time (ms) | Throughput (ops/s) | Wall Time (s) |
+|-----|-------------------:|-------------------:|--------------:|
+| 1 | 7.52 | 249.56 | 8.0 |
+| 2 | 7.45 | 258.57 | 7.7 |
+| 3 | 7.36 | 263.33 | 7.6 |
+
+- **Average response time:** 7.44 ms
+- **Average throughput:** 257.15 ops/s
+
+Observation: With minimal concurrency, latency stays low and throughput remains stable. The system remains responsive under light load.
+
+#### Scenario 2: 10 Buyers + 10 Sellers
+
+| Run | Response Time (ms) | Throughput (ops/s) | Wall Time (s) |
+|-----|-------------------:|-------------------:|--------------:|
+| 1 | 29.70 | 643.48 | 31.1 |
+| 2 | 29.57 | 643.90 | 31.1 |
+| 3 | 29.46 | 665.31 | 30.1 |
+
+- **Average response time:** 29.58 ms
+- **Average throughput:** 650.90 ops/s
+
+Observation: At moderate concurrency, throughput improves substantially because the frontend and gRPC services can process requests in parallel. Response time rises due to queueing and framework overhead under higher load.
+
+#### Scenario 3: 100 Buyers + 100 Sellers
+
+| Run | Response Time (ms) | Throughput (ops/s) | Wall Time (s) |
+|-----|-------------------:|-------------------:|--------------:|
+| 1 | 1150.69 | 169.78 | 1178.0 |
+| 2 | 1145.87 | 163.38 | 1224.2 |
+| 3 | 1215.68 | 159.86 | 1251.1 |
+
+- **Average response time:** 1170.75 ms
+- **Average throughput:** 164.34 ops/s
+
+Observation: At high concurrency, the system becomes saturated. Large numbers of simultaneous HTTP and gRPC requests create major queueing delays, and throughput falls below the moderate-load scenario.
+
+### Cross-Scenario Comparison
+
+| Scenario | Clients | Avg Response Time (ms) | Avg Throughput (ops/s) |
+|----------|---------|-----------------------:|-----------------------:|
+| 1 | 1+1 | 7.44 | 257.15 |
+| 2 | 10+10 | 29.58 | 650.90 |
+| 3 | 100+100 | 1170.75 | 164.34 |
+
+The system scales well from low to moderate concurrency, moving from underutilization to effective parallelism. At very high concurrency, contention dominates and performance degrades sharply.
+
+## Key Findings
+
+The evaluation results show the following for the current system:
+
+1. **Strong performance at low concurrency**
+   - With 1 buyer and 1 seller, the system maintains low latency and stable throughput.
+
+2. **Best throughput at moderate concurrency**
+   - With 10 buyers and 10 sellers, throughput increases significantly as the services make better use of concurrency.
+
+3. **Saturation at high concurrency**
+   - With 100 buyers and 100 sellers, latency rises sharply and throughput drops, indicating queueing delays and resource contention.
+
+4. **Scalability is good up to moderate load**
+   - The architecture handles small and medium workloads effectively, but performance degrades when the number of simultaneous clients becomes very large.
+
+5. **Distributed-service overhead is visible under load**
+   - The combination of REST, gRPC, SOAP, and persistent database access provides clean service boundaries, but also increases end-to-end request cost under heavy concurrency.
+
+## Evaluation Figure
+
+![Evaluation Results](image.png)
+
+## Additional Documentation
+
+- `deploy/README.md` for deployment script details
+- `common/marketplace.proto` for gRPC service definitions
+- `PerformanceReport.md` for the original standalone performance write-up
